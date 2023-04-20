@@ -19,10 +19,27 @@ struct TaskListView: View {
     @State private var isShowAlert = false
     
     var body: some View {
-        List(tasks, id: \.self) { task in
-            withAnimation {
-                Text(task.title)
-            
+        List() {
+            ForEach(tasks.indices, id: \.self) { index in
+                HStack {
+                    Text(tasks[index].title)
+                    Spacer()
+                    if tasks[index].completed {
+                        Image(systemName: "checkmark")
+                    }
+                }
+                .onTapGesture {
+                    tasks[index].completed.toggle()
+                    tasks[index].ref?.updateChildValues(["completed": tasks[index].completed])
+                }
+                .transition(.opacity)
+                .swipeActions(content: {
+                    Button(role: .destructive) {
+                        tasks[index].ref?.removeValue()
+                    } label: {
+                        Label("delete", systemImage: "trash")
+                    }
+                })
             }
         }
         .listStyle(.insetGrouped)
@@ -74,7 +91,7 @@ struct TaskListView: View {
     }
     private func addTapped() {
         isShowAlert.toggle()
-       
+        
     }
     
     private func signOut() {
@@ -85,7 +102,7 @@ struct TaskListView: View {
         }
         isShow.toggle()
     }
-
+    
 }
 
 struct TaskListView_Previews: PreviewProvider {
