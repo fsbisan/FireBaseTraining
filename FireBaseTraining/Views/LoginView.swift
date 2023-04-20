@@ -13,12 +13,12 @@ struct LoginView: View {
     @State private var passwordText = ""
     @State private var warningText = ""
     @State private var isTaskListOpen = false
-    @State private var tasks = ["Купить куклу"]
+    @State private var ref = Database.database().reference(withPath: "users")
     
     var body: some View {
         VStack {
             NavigationLink(isActive: $isTaskListOpen) {
-                TaskListView(tasks: $tasks, isShow: $isTaskListOpen)
+                TaskListView(isShow: $isTaskListOpen)
             } label: {
                 EmptyView()
             }
@@ -82,14 +82,13 @@ struct LoginView: View {
     private func registerTapped() {
         guard loginText != "", passwordText != "" else { return }
         Auth.auth().createUser(withEmail: loginText, password: passwordText) { user, error in
-            if error == nil {
-                if user != nil  {
-                } else {
-                    print("user is not created")
-                }
-            } else {
-                print(error!.localizedDescription)
+            guard error == nil, user != nil else {
+                print(error?.localizedDescription ?? "unown error")
+                return
             }
+            
+            let userRef = ref.child((user?.user.uid)!)
+            userRef.setValue(["email": user?.user.email])
         }
     }
 }

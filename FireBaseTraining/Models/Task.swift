@@ -5,10 +5,9 @@
 //  Created by Александр Макаров on 13.04.2023.
 //
 
-import Foundation
 import Firebase
 
-struct Task {
+struct Task: Hashable {
     let title: String
     let userId: String
     let ref: DatabaseReference?
@@ -33,5 +32,9 @@ struct Task {
         userId = snapshotValue["userId"] as! String
         completed = snapshotValue["completed"] as! Bool
         ref = snapshot.ref
+    }
+    
+    func convertToDictionary() -> Any {
+        return ["title": title, "userId": userId, "completed": completed]
     }
 }
